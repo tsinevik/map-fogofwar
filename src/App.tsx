@@ -1,74 +1,59 @@
-import React, {useEffect} from 'react';
+import React, {useEffect, useState} from 'react';
 import './App.css';
 import 'leaflet/dist/leaflet.css';
-import L from 'leaflet';
-import {MapContainer, TileLayer, Marker, Popup} from 'react-leaflet';
-import {useLeafletContext} from '@react-leaflet/core';
+import {MapContainer, TileLayer} from 'react-leaflet';
 import 'leaflet-maskcanvas';
-import questIcon from './quest.png';
-import landmarkIcon from './landmark.png';
+import {Fog} from "./Fog";
+import {Quest} from "./Quest";
+import {Landmark} from "./Landmark";
 
-const random = (min: number, max: number) => {
-    return Math.random() * (max - min) + min;
+// @ts-ignore
+window.mapData = {
+    quests: [
+        { latlng: [59.954353, 30.322607] },
+        { latlng: [59.939397, 30.321887] },
+    ],
+    landmarks: [
+        { latlng: [59.962453, 30.322507] },
+        { latlng: [59.922697, 30.321387] },
+    ],
+    fog: [
+        [59.954453, 30.322507],
+        [59.939697, 30.321387],
+        [59.954353, 30.322607],
+        [59.939397, 30.321887],
+    ],
 };
 
-function MaskCanvas(props: any) {
-    const context = useLeafletContext();
+// @ts-ignore
+const fogData = window.mapData;
 
+const messageHandler = (message: any) => {
+    console.log(message);
+};
+
+setTimeout(() => {
+    // @ts-ignore
+    window.ReactNativeWebView.postMessage("RN GOT MESSAGE!");
+}, 4000);
+
+const Map = (props: any) => {
     useEffect(() => {
-        // @ts-ignore
-        const mask = L.TileLayer.maskCanvas({
-            radius: 50,  // radius in pixels or in meters (see useAbsoluteRadius)
-            useAbsoluteRadius: true,  // true: r in meters, false: r in pixels
-            color: '#000',  // the color of the layer
-            opacity: 0.5,  // opacity of the not covered area
-            noMask: false,  // true results in normal (filled) circled, instead masked circles
-            lineColor: '#A00'   // color of the circle outline if noMask is true
-        });
-        // @ts-ignore
-        mask.setData(document.mapData.fog);
-        const container = context.layerContainer || context.map;
-        container.addLayer(mask);
+        const isUIWebView = () => {
+            return navigator.userAgent.toLowerCase().match(/\(ip.*applewebkit(?!.*(version|crios))/);
+        };
+
+        const receiver = isUIWebView() ? window : document;
+        receiver.addEventListener('message', messageHandler);
 
         return () => {
-            container.removeLayer(mask);
+            receiver.removeEventListener('message', messageHandler);
         }
-    })
-
-    return null;
-}
-
-function Quest(props: any) {
-    const quest = L.icon({
-        iconUrl: questIcon,
     });
-    return <Marker position={props.latlng} icon={quest}>
-        <Popup>
-            <div>
-                <img src={questIcon} width='150' height='150'/>
-                <div>
-                    <h1>YOOOOOOO</h1>
-                    <span>30 min</span>
-                    <span>30 min</span>
-                    <span>30 min</span>
-                </div>
-                <button>start</button>
-                <button>more</button>
-            </div>
-        </Popup>
-    </Marker>
-}
 
-function Landmark(props: any) {
-    const landmark = L.icon({
-        iconUrl: landmarkIcon,
-    });
-    return <Marker position={props.latlng} icon={landmark}/>
-}
-
-function Map(props: any) {
-    const quests = props.quests.map((quest: any) => <Quest {...quest} />);
-    const landmarks = props.landmarks.map((landmark: any) => <Landmark {...landmark} />);
+    const [fog, setFog] = useState(fogData.fog);
+    const quests = fogData.quests.map((quest: any) => <Quest {...quest} />);
+    const landmarks = fogData.landmarks.map((landmark: any) => <Landmark {...landmark} />);
 
     return (
         <MapContainer
@@ -83,17 +68,15 @@ function Map(props: any) {
                 attribution='&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
                 url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
             />
-            <MaskCanvas/>
+            <Fog fog={fog} />
             {quests}
             {landmarks}
         </MapContainer>
     );
-}
+};
 
-function App() {
-    // @ts-ignore
-    const data = document.mapData;
-    return <Map {...data} />
-}
+const App = () => {
+    return <Map />
+};
 
 export default App;
