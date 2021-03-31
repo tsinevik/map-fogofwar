@@ -1,10 +1,15 @@
-import {useLeafletContext} from "@react-leaflet/core";
-import {useEffect} from "react";
+import { useLeafletContext } from "@react-leaflet/core";
+import { useEffect } from "react";
 import L from "leaflet";
+import { useMapEvent } from "react-leaflet";
 
 // @ts-ignore
-export const Fog = ({fog}) => {
+export const Fog = ({fog, setFog}) => {
     const context = useLeafletContext();
+    useMapEvent('click', (e) => {
+        const { lat, lng } = e.latlng;
+        setFog([...fog, [lat, lng]]);
+    });
 
     useEffect(() => {
         // @ts-ignore
