@@ -11,15 +11,18 @@ const Map = (props: any) => {
     const messageHandler = (message: any) => {
         console.log(message);
         const messageRN = JSON.parse(message.data);
+        const payload = messageRN.payload;
         switch (messageRN.type) {
             case 'initial':
-                const data = messageRN.data;
-                setFog(data.fog);
-                setQuests(data.quests.map((quest: any) => <Quest {...quest} />));
-                setLandmarks(data.landmarks.map((landmark: any) => <Landmark {...landmark} />));
+                setFog(payload.fog);
+                setQuests(payload.quests.map((quest: any) => <Quest {...quest} />));
+                setLandmarks(payload.landmarks.map((landmark: any) => <Landmark {...landmark} />));
                 break;
             case 'test':
-                console.log(messageRN.data);
+                console.log(messageRN.payload);
+                break;
+            case 'FOG_UPDATE':
+                setFog([...fog, payload]);
                 break;
             default:
                 break;
@@ -39,7 +42,9 @@ const Map = (props: any) => {
         }
     });
 
-    const [fog, setFog] = useState([]);
+    type LatLng = [number, number];
+
+    const [fog, setFog] = useState<LatLng[]>([]);
     const [quests, setQuests] = useState([]);
     const [landmarks, setLandmarks] = useState([]);
 
