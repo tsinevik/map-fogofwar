@@ -7,22 +7,22 @@ import { Fog } from "./Fog";
 import { Quest } from "./Quest";
 import { Landmark } from "./Landmark";
 
-const Map = (props: any) => {
+const Map = () => {
     const messageHandler = (message: any) => {
-        console.log(message);
+        // console.log(message);
         const messageRN = JSON.parse(message.data);
         const payload = messageRN.payload;
         switch (messageRN.type) {
-            case 'initial':
+            case 'INITIAL':
                 setFog(payload.fog);
-                setQuests(payload.quests.map((quest: any) => <Quest {...quest} />));
-                setLandmarks(payload.landmarks.map((landmark: any) => <Landmark {...landmark} />));
+                setQuests(Object.keys(payload.quests).map((id: string) => <Quest {...payload.quests[id]} />));
+                setLandmarks(Object.keys(payload.landmarks).map((id: string) => <Landmark {...payload.landmarks[id]} />));
                 break;
             case 'test':
                 console.log(messageRN.payload);
                 break;
-            case 'FOG_UPDATE':
-                setFog([...fog, payload]);
+            case 'UPDATE_FOG':
+                setFog(payload);
                 break;
             default:
                 break;
@@ -45,8 +45,8 @@ const Map = (props: any) => {
     type LatLng = [number, number];
 
     const [fog, setFog] = useState<LatLng[]>([]);
-    const [quests, setQuests] = useState([]);
-    const [landmarks, setLandmarks] = useState([]);
+    const [quests, setQuests] = useState<JSX.Element[]>([]);
+    const [landmarks, setLandmarks] = useState<JSX.Element[]>([]);
 
     return (
         <MapContainer
