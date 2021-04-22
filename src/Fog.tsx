@@ -1,19 +1,17 @@
 import { useLeafletContext } from "@react-leaflet/core";
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 import L from "leaflet";
-import { useMapEvent } from "react-leaflet";
 
 // @ts-ignore
 export const Fog = ({fog, setFog}) => {
     const context = useLeafletContext();
-    useMapEvent('click', (e) => {
-        const { lat, lng } = e.latlng;
-        setFog([...fog, [lat, lng]]);
-    });
+
+    //todo set type
+    const maskRef = useRef<any>();
 
     useEffect(() => {
         // @ts-ignore
-        const mask = L.TileLayer.maskCanvas({
+        maskRef.current = L.TileLayer.maskCanvas({
             radius: 50,  // radius in pixels or in meters (see useAbsoluteRadius)
             useAbsoluteRadius: true,  // true: r in meters, false: r in pixels
             color: '#000',  // the color of the layer
@@ -21,13 +19,16 @@ export const Fog = ({fog, setFog}) => {
             noMask: false,  // true results in normal (filled) circled, instead masked circles
             lineColor: '#A00'   // color of the circle outline if noMask is true
         });
-        mask.setData(fog);
         const container = context.layerContainer || context.map;
-        container.addLayer(mask);
+        container.addLayer(maskRef.current);
 
         return () => {
-            container.removeLayer(mask);
+            container.removeLayer(maskRef.current);
         }
+    }, [context.layerContainer, context.map])
+
+    useEffect(() => {
+        maskRef.current.setData(fog);
     }, [fog])
 
     return null;
