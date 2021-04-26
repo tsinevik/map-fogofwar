@@ -15,8 +15,12 @@ const Map = () => {
         switch (messageRN.type) {
             case 'INITIAL':
                 setFog(payload.fog);
-                setQuests(Object.keys(payload.quests).map((id: string) => <Quest {...payload.quests[id]} />));
-                setLandmarks(Object.keys(payload.landmarks).map((id: string) => <Landmark {...payload.landmarks[id]} />));
+                setQuests(Object.keys(payload.quests).map((id: string) =>
+                    <Quest id={id} {...payload.quests[id]} />)
+                );
+                setLandmarks(Object.keys(payload.landmarks).map((id: string) =>
+                    <Landmark id={id} {...payload.landmarks[id]} />)
+                );
                 break;
             case 'test':
                 console.log(messageRN.payload);
@@ -53,9 +57,11 @@ const Map = () => {
             style={{height: '100vh'}}
             center={[59.986232, 30.299219]}
             zoom={10}
+            minZoom={10}
             maxBounds={[[59.8220, 29.8404], [60.1372, 30.7505]]}
             scrollWheelZoom={true}
             zoomControl={false}
+            attributionControl={false}
         >
             <TileLayer
                 attribution='&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
