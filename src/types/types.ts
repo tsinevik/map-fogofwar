@@ -21,6 +21,7 @@ export interface Quest {
     latlng: LatLng;
     description: string;
     photoUrl: string;
+    completed: boolean;
 }
 
 export interface Landmark {
