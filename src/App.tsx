@@ -4,87 +4,97 @@ import 'leaflet/dist/leaflet.css';
 import { MapContainer, TileLayer } from 'react-leaflet';
 import 'leaflet-maskcanvas';
 import 'leaflet-edgebuffer';
-import { Fog } from "./Fog";
-import { Quest } from "./Quest";
-import { Landmark } from "./Landmark";
-import { LandmarkState, QuestState } from "./types/types";
+import { Fog } from './Fog';
+import { Quest } from './Quest';
+import { Landmark } from './Landmark';
+import { LandmarkState, QuestState } from './types/types';
 
 const Map = () => {
-    const messageHandler = (message: any) => {
-        // console.log(message);
-        const messageRN = JSON.parse(message.data);
-        const payload = messageRN.payload;
-        switch (messageRN.type) {
-            case 'INITIAL':
-                setFog(payload.fog);
-                setQuests(payload.quests);
-                setLandmarks(payload.landmarks);
-                break;
-            case 'test':
-                console.log(messageRN.payload);
-                break;
-            case 'UPDATE_FOG':
-                setFog(payload);
-                break;
-            case 'VISIT_LANDMARK':
-                setLandmarks(prevState => ({ ...prevState,
-                    [payload]: {...prevState[payload], isVisited: true}}))
-                break;
-            default:
-                break;
-        }
+  const messageHandler = (message: any) => {
+    // console.log(message);
+    const messageRN = JSON.parse(message.data);
+    const payload = messageRN.payload;
+    switch (messageRN.type) {
+      case 'INITIAL':
+        setFog(payload.fog);
+        setQuests(payload.quests);
+        setLandmarks(payload.landmarks);
+        break;
+      case 'test':
+        console.log(messageRN.payload);
+        break;
+      case 'UPDATE_FOG':
+        setFog(payload);
+        break;
+      case 'VISIT_LANDMARK':
+        setLandmarks((prevState) => ({
+          ...prevState,
+          [payload]: { ...prevState[payload], isVisited: true },
+        }));
+        break;
+      default:
+        break;
+    }
+  };
+
+  useEffect(() => {
+    //todo информация об ОС передается гет запросом
+    const isUIWebView = () => {
+      return navigator.userAgent
+        .toLowerCase()
+        .match(/\(ip.*applewebkit(?!.*(version|crios))/);
     };
 
-    useEffect(() => {
-        //todo информация об ОС передается гет запросом
-        const isUIWebView = () => {
-            return navigator.userAgent.toLowerCase().match(/\(ip.*applewebkit(?!.*(version|crios))/);
-        };
+    const receiver = isUIWebView() ? window : document;
+    receiver.addEventListener('message', messageHandler);
 
-        const receiver = isUIWebView() ? window : document;
-        receiver.addEventListener('message', messageHandler);
+    return () => {
+      receiver.removeEventListener('message', messageHandler);
+    };
+  });
 
-        return () => {
-            receiver.removeEventListener('message', messageHandler);
-        }
-    });
+  type LatLng = [number, number];
 
-    type LatLng = [number, number];
+  const [fog, setFog] = useState<LatLng[]>([]);
+  const [quests, setQuests] = useState<QuestState>({});
+  const [landmarks, setLandmarks] = useState<LandmarkState>({});
 
-    const [fog, setFog] = useState<LatLng[]>([]);
-    const [quests, setQuests] = useState<QuestState>({});
-    const [landmarks, setLandmarks] = useState<LandmarkState>({});
-
-    return (
-        <MapContainer
-            style={{height: '100vh'}}
-            center={[59.986232, 30.299219]}
-            zoom={10}
-            minZoom={10}
-            maxBounds={[[59.8220, 29.8404], [60.1372, 30.7505]]}
-            maxBoundsViscosity={1}
-            scrollWheelZoom={true}
-            zoomControl={false}
-            attributionControl={false}
-        >
-            <TileLayer
-                minZoom={10}
-                minNativeZoom={10}
-                // @ts-ignore
-                edgeBufferTiles={4}
-                // detectRetina
-                attribution='&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
-                url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-            />
-            <Fog fog={fog} setFog={setFog}/>
-            {Object.keys(quests).map((id: string) => <Quest id={id} {...quests[id]} />)}
-            {Object.keys(landmarks).map((id: string) => <Landmark id={id} {...landmarks[id]} />)}
-        </MapContainer>
-    );
+  return (
+    <MapContainer
+      style={{ height: '100vh' }}
+      center={[59.986232, 30.299219]}
+      zoom={10}
+      minZoom={10}
+      maxBounds={[
+        [59.822, 29.8404],
+        [60.1372, 30.7505],
+      ]}
+      maxBoundsViscosity={1}
+      scrollWheelZoom={true}
+      zoomControl={false}
+      attributionControl={false}>
+      <TileLayer
+        minZoom={10}
+        minNativeZoom={10}
+        // @ts-ignore
+        edgeBufferTiles={4}
+        // detectRetina
+        attribution='&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
+        url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+      />
+      <Fog fog={fog} setFog={setFog} />
+      {Object.keys(quests).map((id: string) => (
+        <Quest id={id} {...quests[id]} />
+      ))}
+      {Object.keys(landmarks).map((id: string) => (
+        <Landmark id={id} {...landmarks[id]} />
+      ))}
+    </MapContainer>
+  );
 };
 
 const App = () => {
-    return <Map/>
+  return <Map />;
 };
 
 export default App;
