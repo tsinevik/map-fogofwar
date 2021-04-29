@@ -20,7 +20,7 @@ export const Quest = (props: any) => {
                         <span>30 min</span>
                     </div>
                     <button>start</button>
-                    <button onClick={() => sendMessage('QUEST', props.id)}>more</button>
+                    <button onClick={() => sendMessage('OPEN_QUEST', props.id)}>more</button>
                 </div>
             </Popup>
         </Marker>
