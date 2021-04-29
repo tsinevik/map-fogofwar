@@ -16,7 +16,7 @@ export const Landmark = (props: any) => {
           <img alt="something" src={questIcon} width="150" height="150" />
           <div>
             <h1>{props.name}</h1>
-            <span>{props.isVisited.toString()}</span>
+            <span>{props.visited.toString()}</span>
             <span>30 min</span>
             <span>30 min</span>
           </div>

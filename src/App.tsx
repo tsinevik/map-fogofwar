@@ -11,7 +11,6 @@ import { LandmarkState, QuestState } from './types/types';
 
 const Map = () => {
   const messageHandler = (message: any) => {
-    // console.log(message);
     const messageRN = JSON.parse(message.data);
     const payload = messageRN.payload;
     switch (messageRN.type) {
@@ -29,7 +28,7 @@ const Map = () => {
       case 'VISIT_LANDMARK':
         setLandmarks((prevState) => ({
           ...prevState,
-          [payload]: { ...prevState[payload], isVisited: true },
+          [payload]: { ...prevState[payload], visited: true },
         }));
         break;
       default:
