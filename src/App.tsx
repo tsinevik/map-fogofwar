@@ -3,9 +3,11 @@ import './App.css';
 import 'leaflet/dist/leaflet.css';
 import { MapContainer, TileLayer } from 'react-leaflet';
 import 'leaflet-maskcanvas';
+import 'leaflet-edgebuffer';
 import { Fog } from "./Fog";
 import { Quest } from "./Quest";
 import { Landmark } from "./Landmark";
+import { LandmarkState, QuestState } from "./types/types";
 
 const Map = () => {
     const messageHandler = (message: any) => {
@@ -15,12 +17,8 @@ const Map = () => {
         switch (messageRN.type) {
             case 'INITIAL':
                 setFog(payload.fog);
-                setQuests(Object.keys(payload.quests).map((id: string) =>
-                    <Quest id={id} {...payload.quests[id]} />)
-                );
-                setLandmarks(Object.keys(payload.landmarks).map((id: string) =>
-                    <Landmark id={id} {...payload.landmarks[id]} />)
-                );
+                setQuests(payload.quests);
+                setLandmarks(payload.landmarks);
                 break;
             case 'test':
                 console.log(messageRN.payload);
@@ -28,12 +26,17 @@ const Map = () => {
             case 'UPDATE_FOG':
                 setFog(payload);
                 break;
+            case 'VISIT_LANDMARK':
+                setLandmarks(prevState => ({ ...prevState,
+                    [payload]: {...prevState[payload], isVisited: true}}))
+                break;
             default:
                 break;
         }
     };
 
     useEffect(() => {
+        //todo информация об ОС передается гет запросом
         const isUIWebView = () => {
             return navigator.userAgent.toLowerCase().match(/\(ip.*applewebkit(?!.*(version|crios))/);
         };
@@ -49,8 +52,8 @@ const Map = () => {
     type LatLng = [number, number];
 
     const [fog, setFog] = useState<LatLng[]>([]);
-    const [quests, setQuests] = useState<JSX.Element[]>([]);
-    const [landmarks, setLandmarks] = useState<JSX.Element[]>([]);
+    const [quests, setQuests] = useState<QuestState>({});
+    const [landmarks, setLandmarks] = useState<LandmarkState>({});
 
     return (
         <MapContainer
@@ -59,17 +62,23 @@ const Map = () => {
             zoom={10}
             minZoom={10}
             maxBounds={[[59.8220, 29.8404], [60.1372, 30.7505]]}
+            maxBoundsViscosity={1}
             scrollWheelZoom={true}
             zoomControl={false}
             attributionControl={false}
         >
             <TileLayer
+                minZoom={10}
+                minNativeZoom={10}
+                // @ts-ignore
+                edgeBufferTiles={4}
+                // detectRetina
                 attribution='&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
                 url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
             />
             <Fog fog={fog} setFog={setFog}/>
-            {quests}
-            {landmarks}
+            {Object.keys(quests).map((id: string) => <Quest id={id} {...quests[id]} />)}
+            {Object.keys(landmarks).map((id: string) => <Landmark id={id} {...landmarks[id]} />)}
         </MapContainer>
     );
 };
