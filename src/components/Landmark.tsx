@@ -1,9 +1,9 @@
 import L from 'leaflet';
-import landmarkIcon from './landmark.png';
+import landmarkIcon from '../assets/icons/landmark.png';
 import { Marker, Popup } from 'react-leaflet';
 import React from 'react';
-import questIcon from './quest.png';
-import { sendMessage } from './message-service';
+import questIcon from '../assets/icons/quest.png';
+import { sendMessage } from '../api/message-service';
 
 export const Landmark = (props: any) => {
   const landmark = L.icon({

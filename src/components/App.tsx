@@ -1,13 +1,17 @@
 import React, { useEffect, useState } from 'react';
-import './App.css';
+import '../styles/App.css';
 import 'leaflet/dist/leaflet.css';
 import { MapContainer, TileLayer } from 'react-leaflet';
 import 'leaflet-maskcanvas';
 import 'leaflet-edgebuffer';
+import 'leaflet.locatecontrol';
+import 'leaflet-routing-machine';
 import { Fog } from './Fog';
 import { Quest } from './Quest';
 import { Landmark } from './Landmark';
-import { LandmarkState, QuestState } from './types/types';
+import { LandmarkState, QuestState } from '../types/types';
+import RoutingMachine from './Routing';
+import Geolocation from "./Geolocation";
 
 const Map = () => {
   const messageHandler = (message: any) => {
@@ -37,7 +41,7 @@ const Map = () => {
   };
 
   useEffect(() => {
-    //todo информация об ОС передается гет запросом
+    //todo информация об ОС передается GET-запросом
     const isUIWebView = () => {
       return navigator.userAgent
         .toLowerCase()
@@ -57,6 +61,7 @@ const Map = () => {
   const [fog, setFog] = useState<LatLng[]>([]);
   const [quests, setQuests] = useState<QuestState>({});
   const [landmarks, setLandmarks] = useState<LandmarkState>({});
+  let locationRef;
 
   return (
     <MapContainer
@@ -82,6 +87,8 @@ const Map = () => {
         url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
       />
       <Fog fog={fog} setFog={setFog} />
+      <RoutingMachine />
+      <Geolocation />
       {Object.keys(quests).map((id: string) => (
         <Quest id={id} {...quests[id]} />
       ))}
