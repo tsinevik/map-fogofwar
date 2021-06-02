@@ -10,6 +10,7 @@ const createGeolocationLayer = (props: any) => {
             outOfView: 'inView',
             inViewNotFollowing: 'inView',
         },
+
     };
     // @ts-ignore
     const instance = L.control.locate(geolocationConfig);

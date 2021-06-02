@@ -17,3 +17,18 @@ div.leaflet-top.leaflet-right {
     width: 0 !important;
     height: 0 !important;
 }
+
+@font-face {
+    font-family: 'Montserrat';
+    src: local('Montserrat'), url(../assets/fonts/Montserrat-Bold.ttf) format('truetype');
+}
+
+div.leaflet-control-locate.leaflet-control,
+div.leaflet-control-locate > a.leaflet-bar-part.leaflet-bar-part-single {
+    border-radius: 50px;
+    background-color: #886B57;
+    background-image: url("../assets/icons/location.svg");
+    height: 64px;
+    width: 64px;
+    margin-bottom: 60px;
+}

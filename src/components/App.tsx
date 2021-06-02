@@ -1,17 +1,20 @@
 import React, { useEffect, useState } from 'react';
-import '../styles/App.css';
 import 'leaflet/dist/leaflet.css';
+import '../styles/Popup.css';
+import 'react-leaflet-markercluster/dist/styles.min.css';
 import { MapContainer, TileLayer } from 'react-leaflet';
 import 'leaflet-maskcanvas';
 import 'leaflet-edgebuffer';
 import 'leaflet.locatecontrol';
 import 'leaflet-routing-machine';
-import { Fog } from './Fog';
 import { Quest } from './Quest';
 import { Landmark } from './Landmark';
-import { LandmarkState, QuestState } from '../types/types';
+import { LandmarkState, LatLng, QuestState } from '../types/types';
+import Fog from './Fog';
 import RoutingMachine from './Routing';
-import Geolocation from "./Geolocation";
+import Geolocation from './Geolocation';
+// @ts-ignore
+import MarkerClusterGroup from 'react-leaflet-markercluster';
 
 const Map = () => {
   const messageHandler = (message: any) => {
@@ -56,15 +59,13 @@ const Map = () => {
     };
   });
 
-  type LatLng = [number, number];
-
   const [fog, setFog] = useState<LatLng[]>([]);
   const [quests, setQuests] = useState<QuestState>({});
   const [landmarks, setLandmarks] = useState<LandmarkState>({});
-  let locationRef;
 
   return (
     <MapContainer
+      tap={false}
       style={{ height: '100vh' }}
       center={[59.986232, 30.299219]}
       zoom={10}
@@ -86,15 +87,17 @@ const Map = () => {
         attribution='&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
         url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
       />
-      <Fog fog={fog} setFog={setFog} />
+      <Fog fog={fog} />
       <RoutingMachine />
       <Geolocation />
+      <MarkerClusterGroup>
       {Object.keys(quests).map((id: string) => (
         <Quest id={id} {...quests[id]} />
       ))}
       {Object.keys(landmarks).map((id: string) => (
         <Landmark id={id} {...landmarks[id]} />
       ))}
+      </MarkerClusterGroup>
     </MapContainer>
   );
 };
