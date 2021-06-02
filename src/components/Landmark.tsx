@@ -1,19 +1,19 @@
 import L from 'leaflet';
-import landmarkIcon from '../assets/icons/landmark.png';
+import landmarkIcon from '../assets/icons/landmark.svg';
 import { Marker, Popup } from 'react-leaflet';
 import React from 'react';
-import questIcon from '../assets/icons/quest.png';
 import { sendMessage } from '../api/message-service';
 
 export const Landmark = (props: any) => {
   const landmark = L.icon({
     iconUrl: landmarkIcon,
+    iconSize: [44, 44],
   });
   return (
     <Marker position={props.latlng} icon={landmark}>
       <Popup>
         <div>
-          <img alt="something" src={questIcon} width="150" height="150" />
+          {/*<img alt="something" src={landmark} width="150" height="150" />*/}
           <div>
             <h1>{props.name}</h1>
             <span>{props.visited.toString()}</span>
